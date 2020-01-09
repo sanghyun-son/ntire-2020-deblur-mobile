@@ -15,7 +15,7 @@ def main():
     parser.add_argument('--batch_size', type=int, defalut=16)
     parser.add_argument('--epochs', type=int, defalut=100)
     parser.add_argument('--exp_name', type=str, defalut='baseline')
-    parser.add_argument('--save_to', type=str, defalut='deblur.tflite')
+    parser.add_argument('--save_to', type=str, defalut='models/deblur.tflite')
     cfg = parser.parse_args()
 
     # For checking the GPU usage

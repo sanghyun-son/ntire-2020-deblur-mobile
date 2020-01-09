@@ -7,6 +7,7 @@ This repository provides a basic tutorial for the NTIRE 2020 Image Deblurring Ch
 We recommend the conda environment on the Linux machine. Please clone this repository and import the given conda environment by following:
 
 ```bash
+git clone https://github.com/thstkdgus35/ntire-2020-deblur-mobile.git
 cd ntire-2020-deblur-mobile
 conda env create -f environment.yml
 ```

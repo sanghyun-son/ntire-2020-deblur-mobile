@@ -30,7 +30,7 @@ import tensorflow as tf
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--image', type=str, default='example/input.png')
-    parser.add_argument('-m', '--model_file', type=str, default='deblur.tflite')
+    parser.add_argument('-m', '--model_file', type=str, default='models/deblur.tflite')
     args = parser.parse_args()
 
     interpreter = tf.lite.Interpreter(model_path=args.model_file)
