@@ -12,11 +12,12 @@ cd ntire-2020-deblur-mobile
 conda env create -f environment.yml
 ```
 
-[TensorFlow 2.0](https://www.tensorflow.org/) and [PyTorch 1.3.1](https://pytorch.org/) will be installed by default. You can use any libraries, but we heavily recommend the TensorFlow for easier mobile deployment.
+[TensorFlow 2.1](https://www.tensorflow.org/) and [PyTorch 1.4](https://pytorch.org/) will be installed by default. You can use any libraries, but we heavily recommend the TensorFlow for easier mobile deployment.
 
 We also note that this repository is verified in the following environments:
-* Ubuntu 16.04
-* CUDA 10.0 (For TensorFlow) / CUDA 10.2 (For PyTorch)
+* Ubuntu 16.04 / 18.04
+* CUDA 10.0 (For TensorFlow) / CUDA 10.1 (For PyTorch)
+* CuDNN 7.6.5
 
 ## Prepare the dataset
 
@@ -91,6 +92,9 @@ Additional arguments:
     --patch_size: Training patch size
     --batch_size: Training batch size
     --epochs    : The number of total epochs
+    --lr        : Initial learning rate
+    --lr_gamma  : Learning rate decay factor
+    --milestones: Learning rate schedule (ex: --milestones 10 20 30)
     --save_to   : Path of the model checkpoint (weights ONLY) to be saved
 ```
 

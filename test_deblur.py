@@ -19,11 +19,13 @@ from __future__ import print_function
 
 import os
 from os import path
+import time
 import argparse
+import data
+
 import numpy as np
 import imageio
 
-import data
 import tensorflow as tf
 
 
@@ -48,13 +50,17 @@ def main():
     save_dir = 'example'
     os.makedirs(save_dir, exist_ok=True)
 
-    # add N dim
     if floating_model:
         img = data.normalize(img)
 
     input_data = np.expand_dims(img, axis=0)
     interpreter.set_tensor(input_details[0]['index'], input_data)
+
+    # Note that we only measure the invoke time
+    time_begin = time.time()
     interpreter.invoke()
+    time_end = time.time()
+
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)
 
@@ -63,6 +69,8 @@ def main():
     results = results.astype(np.uint8)
 
     imageio.imwrite(path.join(save_dir, 'output.png'), results)
+    time_total = time_end - time_begin
+    print('Time: {:.3f}s {:.1f}fps'.format(time_total, 1 / time_total))
 
 if __name__ == '__main__':
     main()

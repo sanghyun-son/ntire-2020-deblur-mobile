@@ -1,5 +1,7 @@
+import os
 from os import path
 import argparse
+import bisect
 
 import tensorflow as tf
 from tensorflow import lite
@@ -11,15 +13,25 @@ import metric
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--patch_size', type=int, defalut=128)
-    parser.add_argument('--batch_size', type=int, defalut=16)
-    parser.add_argument('--epochs', type=int, defalut=100)
-    parser.add_argument('--exp_name', type=str, defalut='baseline')
-    parser.add_argument('--save_to', type=str, defalut='models/deblur.tflite')
+    parser.add_argument('--patch_size', type=int, default=128)
+    parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--epochs', type=int, default=20)
+    parser.add_argument('--lr', type=float, default=1e-4)
+    parser.add_argument('--lr_gamma', type=float, default=0.5)
+    parser.add_argument('--milestones', nargs='+', default=[10, 15])
+    parser.add_argument('--exp_name', type=str, default='baseline')
+    parser.add_argument('--save_to', type=str, default='models/deblur.hdf5')
     cfg = parser.parse_args()
 
     # For checking the GPU usage
     #tf.debugging.set_log_device_placement(True)
+    # For limiting the GPU usage
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            tf.config.experimental.set_memory_growth(gpus[0], True)
+        except RuntimeError as e:
+            print(e)
 
     dataset_train = data.REDS(
         cfg.batch_size, patch_size=cfg.patch_size, train=True
@@ -28,28 +40,39 @@ def main():
     # Note that each frame will be center-cropped for the validation.
     dataset_val = data.REDS(20, patch_size=cfg.patch_size, train=False)
 
-    net = model.SRCNN(cfg.patch_size, cfg.patch_size)
+    net = model.Baseline(cfg.patch_size, cfg.patch_size)
+    net.build(input_shape=(None, cfg.patch_size, cfg.patch_size, 3))
     net.compile(optimizer='adam', loss='mse', metrics=[metric.psnr])
     net.summary()
 
+    # Callback functions
+    # For TensorBoard logging
     logging = callbacks.TensorBoard(
         log_dir=path.join('logs', cfg.exp_name),
         update_freq=100,
     )
+    # For checkpointing
+    os.makedirs(path.dirname(cfg.save_to), exist_ok=True)
     checkpointing = callbacks.ModelCheckpoint(
         cfg.save_to,
         verbose=1,
         save_weights_only=True,
     )
+    def scheduler(epoch):
+        idx = bisect.bisect_right(cfg.milestones, epoch)
+        lr = cfg.lr * (cfg.lr_gamma**idx)
+        return lr
+    # For learning rate scheduling
+    scheduling = callbacks.LearningRateScheduler(scheduler, verbose=1)
 
     net.fit_generator(
         dataset_train,
-        epochs=100,
-        callbacks=[logging, checkpointing],
+        epochs=cfg.epochs,
+        callbacks=[logging, checkpointing, scheduling],
         validation_data=dataset_val,
         validation_freq=1,
-        max_queue_size=256,
-        workers=12,
+        max_queue_size=16,
+        workers=8,
         use_multiprocessing=True,
     )
 
