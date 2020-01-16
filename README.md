@@ -37,7 +37,7 @@ First, download the **REDS_deblur** dataset from the following links.
 Your data should be organized as following:
 
 ```bash
-$(THIS_REPOSITORY)
+ntire-2020-deblur-mobile
 |--REDS_deblur
 |   |-- train
 |   |   |-- train_blur
@@ -60,15 +60,15 @@ $(THIS_REPOSITORY)
 `-- ...
 ```
 
-Since images in the dataset are pretty large (1280 x 720), we recommend to preprocessing to save time for data loading. For example, you can run the `preprocess.py` to crop each frame of REDS_deblur dataset into 16 subregions.
+Since images in the dataset are pretty large (1280 x 720), we recommend a preprocessing step to save time for data loading. You can run the `preprocess.py` to crop each frame of REDS_deblur dataset into 16 subregions.
 
 ```bash
-# You are in $(THIS_REPOSITORY)/.
+# You are in ntire-2020-deblur-mobile/.
 # This may take some time...
 $ python preprocess.py
 ```
 
-After then, you will get `train_crop` under `REDS_deblur`. We note that this preprocessing **does not** affect to the number of effective training patches.
+After then, you will get `train_crop` under `REDS_deblur`. We note that this **does not** affect to the number of effective training patches.
 
 
 ## Training a baseline model
@@ -85,7 +85,7 @@ metric.py
 You can start the training by the following:
 
 ```bash
-# You are in $(THIS_REPOSITORY)/.
+# You are in ntire-2020-deblur-mobile/.
 $ python main.py --exp_name [EXPERIMENT_NAME]
 
 Additional arguments:
@@ -112,7 +112,7 @@ By default, [`localhost:6006`](http://localhost:6006/) will show you training an
 If you are training your model with the TensorFlow framework, it is straightforward to convert them into a TFLite model.
 
 ```bash
-# You are in $(THIS_REPOSITORY)/.
+# You are in ntire-2020-deblur-mobile/.
 $ python convert_model.py
 
 Additional arguments:
@@ -130,7 +130,7 @@ If you want to convert your PyTorch model to a TFLite model, please follow the g
 You can easily check the converted TFLite model on your PC.
 
 ```bash
-# You are in $(THIS_REPOSITORY)/.
+# You are in ntire-2020-deblur-mobile/.
 $ python test_deblur.py
 
 Additional arguments:
@@ -157,5 +157,5 @@ Unfortunately, there is no straightforward way to convert your PyTorch `state_di
 
 1) Train your model on PyTorch.
 2) Save your PyTorch `state_dict` (i.e., `torch.save(model.state_dict(), 'state_dict.pth')`).
-3) Define a [Keras model](https://www.tensorflow.org/api_docs/python/tf/keras/Model) which has the same structure to your PyTorch model.
+3) Define a [Keras model](https://www.tensorflow.org/api_docs/python/tf/keras/Model) which has the same structure to your PyTorch model. You can compare `model_pth.py` and `model.py` to see differences of two frameworks.
 4) Will be prepared soon...
