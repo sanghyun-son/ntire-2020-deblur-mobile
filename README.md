@@ -12,9 +12,9 @@ cd ntire-2020-deblur-mobile
 conda env create -f environment.yml
 ```
 
-[TensorFlow 2.1](https://www.tensorflow.org/) and [PyTorch 1.4](https://pytorch.org/) will be installed by default. You can use any libraries, but we heavily recommend the TensorFlow for easier mobile deployment.
+[TensorFlow 2.1](https://www.tensorflow.org/) and [PyTorch 1.4](https://pytorch.org/) will be installed by default. You can use any libraries of any versions, but we heavily recommend the TensorFlow for easier mobile deployment. We note that the final goal of this challenge track is to submit `.tflite` model.
 
-We also note that this repository is verified in the following environments:
+This repository is verified in the following environments:
 * Ubuntu 16.04 / 18.04
 * CUDA 10.0 (For TensorFlow) / CUDA 10.1 (For PyTorch)
 * CuDNN 7.6.5
@@ -38,7 +38,7 @@ Your data should be organized as following:
 
 ```bash
 $(THIS_REPOSITORY)
-|--REDS_deblur
+|-- REDS_deblur
 |   |-- train
 |   |   |-- train_blur
 |   |   |   |-- 000
@@ -60,7 +60,7 @@ $(THIS_REPOSITORY)
 `-- ...
 ```
 
-Since images in the dataset are pretty large (1280 x 720), we recommend to preprocessing to save time for data loading. For example, you can run the `preprocess.py` to crop each frame of REDS_deblur dataset into 16 subregions.
+Since images in the dataset are pretty large (1280 x 720), we recommend a preprocessing stage to save time for data loading. You can run the `preprocess.py` to crop each frame of `REDS_deblur` dataset into 16 subregions.
 
 ```bash
 # You are in $(THIS_REPOSITORY)/.
@@ -141,19 +141,120 @@ Additional arguments:
 You can find a result image from `example/output.png`.
 
 
-## Test your TFLite model on virtual Android environment
-
-Will be prepared soon...
-
-
 ## Test your TFLite model on a real Android device
 
-Will be prepared soon...
+We note that final submissions should be generated from the submitted TFLite model.
+We will double-check whether submitted deblurred images can be acquired from the submitted TFLite models.
+However, for easier performance evaluation, we will execute the TFLite model on a real Android device **only** for measuring runtime.
+Detailed comments on this concept can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/benchmark).
+
+In short, we will measure the average runtime of each model using randomly generated inputs.
+As a result, input-dependent models will not be allowed at this moment (and it is very challenging to optimize those input-dependent models for mobile devices).
+
+We use the [Google Pixel 4](https://store.google.com/?srp=/product/pixel_4) device (Android 10) for evaluation.
+If you are going to use different devices, please change some API versions to appropriate ones.
+More detailed explanation of the tutorial can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android), but we recommend to follow package versions of the configurations below.
+
+First, install the [Android studio](https://developer.android.com/studio/install?hl=en) and SDK by running the studio.
+[Android NDK](https://developer.android.com/ndk/guides) is also required, and we note that the NDK version (**18b**) matters.
+Please download the zip file from [here](https://developer.android.com/ndk/downloads/older_releases.html#ndk-18b-downloads) and unzip it.
+If you are not sure with the file path, you can skip this now.
+
+Then, clone the TensorFlow official repository by following:
+
+```bash
+# You can run the below scripts anywhere you want.
+$ git clone --recurse-submodules https://github.com/tensorflow/tensorflow.git
+$ cd tensorflow
+```
+
+Bazel will be used to build the evaluation binary.
+Detailed descriptions can be found from [here](https://docs.bazel.build/versions/master/install-ubuntu.html).
+We note that the Bazel version (**1.2.1**) matters.
+
+```bash
+$ sudo apt install curl
+$ curl https://bazel.build/bazel-release.pub.gpg \
+    | sudo apt-key add -
+$ echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" \
+    | sudo tee /etc/apt/sources.list.d/bazel.list
+$ sudo apt update
+# Please specifiy the Bazel version.
+$ sudo apt install bazel-1.2.1
+```
+
+Before building the evaluation binary, please setup the configuration by following:
+
+```bash
+# You are in tensorflow/.
+$ ./configure
+Please specify the location of python. [ENTER]
+Please input the desired Python library path to use. [ENTER]
+Do you wish to build TensorFlow with XLA JIT support? [n]
+Do you wish to build TensorFlow with OpenCL SYCL support? [N]
+Do you wish to build TensorFlow with ROCm support? [N]
+Do you wish to build TensorFlow with CUDA support? [y]
+Do you wish to build TensorFlow with TensorRT support? [N]
+Please specify a list of comma-separated CUDA compute capabilities you want to build with. (...) [ENTER]
+Do you want to use clang as CUDA compiler? [N]
+Please specify which gcc should be used by nvcc as the host compiler. [ENTER]
+Please specify optimization flags to use during compilation when bazel option "--config=opt" is specified. [ENTER]
+Would you like to interactively configure ./WORKSPACE for Android builds? [y]
+# Now you require the NDK from above.
+# $(PATH_TO_NDK_DIRECTORY)
+# |-- build
+# |-- CHANGELOG.md
+# |-- meta
+# |-- ...
+# `-- wrap.sh
+Please specify the home path of the Android NDK to use. [PATH_TO_NDK_DIRECTORY]
+Please specify the (min) Android NDK API level to use. [21]
+Please specify the home path of the Android SDK to use. [ENTER]
+Please specify the Android SDK API level to use. [29]
+Please specify an Android build tools version to use. [29.0.2]
+```
+
+Then, build the evaluation binary.
+We note that we are not building the whole TensorFlow.
+
+```bash
+$ bazel build -c opt \
+    --config=android_arm \
+    --cxxopt='--std=c++14' \
+    tensorflow/lite/tools/benchmark:benchmark_model
+```
+
+Connect your own Android device to PC.
+Please make sure that you have enabled the [USB debugging mode](https://developer.android.com/studio/debug/dev-options?hl=en) and allowed file transfer from PC.
+Now you are ready to run  the `.tflite` model on a real Android device.
+
+```bash
+$ adb push bazel-bin/tensorflow/lite/tools/benchmark/benchmark_model /data/local/tmp
+$ adb shell chmod +x /data/local/tmp/benchmark_model
+$ adb push [PATH_TO_TFLITE_MODEL]/[NAME_OF_TFLITE_MODEL] /data/local/tmp
+$ adb shell /data/local/tmp/benchmark_model \
+    --graph=/data/local/tmp/[NAME_OF_TFLITE_MODEL] \
+    --num_threads=4
+```
+
+Please find out **Average inference timings in us** from the printed logs.
+We note that Warpup & Init timings will not be considered in this challenge.
+
+We report performances of the provided baseline model (input: 256 x 256).
+More options can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/benchmark).
+Detailed analysis of each model and their quantized version will be uploaded soon.
+| Avg. runtime(ms) and FPS (50 runs) |     CPU    |       GPU        |       NNAPI        |
+|:----------------------------------:|:----------:|:----------------:|:------------------:|
+|      Full-precision                | 775 / 1.30 |   121 / 8.23     |    226 / 4.42      |
+|         Quantized                  |      -     |        -         |         -          |
+|                                    |            | `--use_gpu=true` | `--use_nnapi=true` |
 
 
 ## PyTorch `state_dict` to a TFLite model
 
-Unfortunately, there is no straightforward way to convert your PyTorch `state_dict` to a TFLite model directly. The major problem comes from the channel convention: while `(N, C, H, W)` is common in PyTorch, TFLite only supports `(N, H, W, C)`. Please follow the steps below carefully to transfer your model from PyTorch.
+Unfortunately, there is no straightforward way to convert your PyTorch `state_dict` to a TFLite model directly.
+The major problem comes from the channel convention: while `(N, C, H, W)` is common in PyTorch, TFLite only supports `(N, H, W, C)`.
+Please follow the steps below carefully to transfer your model from PyTorch.
 
 1) Train your model on PyTorch.
 2) Save your PyTorch `state_dict` (i.e., `torch.save(model.state_dict(), 'state_dict.pth')`).
