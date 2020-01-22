@@ -218,6 +218,7 @@ Then, build the evaluation binary.
 We note that we are not building the whole TensorFlow.
 
 ```bash
+# You are in tensorflow/.
 $ bazel build -c opt \
     --config=android_arm \
     --cxxopt='--std=c++14' \
@@ -229,6 +230,7 @@ Please make sure that you have enabled the [USB debugging mode](https://develope
 Now you are ready to run  the `.tflite` model on a real Android device.
 
 ```bash
+# You are in tensorflow/.
 $ adb push bazel-bin/tensorflow/lite/tools/benchmark/benchmark_model /data/local/tmp
 $ adb shell chmod +x /data/local/tmp/benchmark_model
 $ adb push [PATH_TO_TFLITE_MODEL]/[NAME_OF_TFLITE_MODEL] /data/local/tmp
@@ -243,6 +245,7 @@ We note that Warpup & Init timings will not be considered in this challenge.
 We report performances of the provided baseline model (input: 256 x 256).
 More options can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/benchmark).
 Detailed analysis of each model and their quantized version will be uploaded soon.
+
 | Avg. runtime(ms) and FPS (50 runs) |     CPU    |       GPU        |       NNAPI        |
 |:----------------------------------:|:----------:|:----------------:|:------------------:|
 |      Full-precision                | 775 / 1.30 |   121 / 8.23     |    226 / 4.42      |
