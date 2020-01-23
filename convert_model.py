@@ -12,7 +12,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--load_from', type=str, default='models/deblur.hdf5')
     parser.add_argument('--save_to', type=str, default='models/deblur.tflite')
-    parser.add_argument('--test', type=str, default='example/input_256.png')
+    parser.add_argument('--test', type=str, default='example/input.png')
     cfg = parser.parse_args()
 
     gpus = tf.config.experimental.list_physical_devices('GPU')

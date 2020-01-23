@@ -19,3 +19,10 @@ def psnr(x, y, shave=4, luminance=False):
 def psnr_y(x, y):
     return psnr(x, y, luminance=True)
 
+def psnr_np(x, y, shave=4, luminance=False):
+    diff = x.astype(np.float32) - y.astype(np.float32)
+    diff = diff[..., shave:-shave, shave:-shave, :]
+    diff = diff / 255
+    mse = np.mean(diff**2)
+    ret = -10.0 * (np.log(mse) / K.log(10.0))
+    return ret

@@ -24,15 +24,15 @@ This repository is verified in the following environments:
 First, download the **REDS_deblur** dataset from the following links.
 
 * Training data
-  * Blur: [Google drive](https://drive.google.com/open?id=1Be2cgzuuXibcqAuJekDgvHq4MLYkCgR8) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/train_blur.zip)
-  * Sharp: [Google drive](https://drive.google.com/open?id=1YLksKtMhd2mWyVSkvhDaDLWSc1qYNCz-) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/train_sharp.zip)
+ * Blur: [Google drive](https://drive.google.com/open?id=1Be2cgzuuXibcqAuJekDgvHq4MLYkCgR8) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/train_blur.zip)
+ * Sharp: [Google drive](https://drive.google.com/open?id=1YLksKtMhd2mWyVSkvhDaDLWSc1qYNCz-) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/train_sharp.zip)
 
 * Validation data
-  * Blur: [Google drive](https://drive.google.com/open?id=1N8z2yD0GDWmh6U4d4EADERtcUgDzGrHx) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/val_blur.zip)
-  * Sharp: [Google drive](https://drive.google.com/open?id=1MGeObVQ1-Z29f-myDP7-8c3u0_xECKXq) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/val_sharp.zip)
+ * Blur: [Google drive](https://drive.google.com/open?id=1N8z2yD0GDWmh6U4d4EADERtcUgDzGrHx) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/val_blur.zip)
+ * Sharp: [Google drive](https://drive.google.com/open?id=1MGeObVQ1-Z29f-myDP7-8c3u0_xECKXq) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/val_sharp.zip)
 
 * Test data
-  * Blur: [Google drive](https://drive.google.com/file/d/1dr0--ZBKqr4P1M8lek6JKD1Vd6bhhrZT/view?usp=sharing) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/test_blur.zip)
+ * Blur: [Google drive](https://drive.google.com/file/d/1dr0--ZBKqr4P1M8lek6JKD1Vd6bhhrZT/view?usp=sharing) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/test_blur.zip)
 
 Your data should be organized as following:
 
@@ -45,7 +45,7 @@ $(THIS_REPOSITORY)
 |   |   |   |-- 001
 |   |   |   `-- ...
 |   |   `-- train_sharp
-|   |       `-- ...
+|   |   `-- ...
 |   |-- val
 |   |   |-- val_blur
 |   |   |   `-- ...
@@ -60,7 +60,7 @@ $(THIS_REPOSITORY)
 `-- ...
 ```
 
-Since images in the dataset are pretty large (1280 x 720), we recommend a preprocessing stage to save time for data loading. You can run the `preprocess.py` to crop each frame of `REDS_deblur` dataset into 16 subregions.
+Since images in the dataset are pretty large (1280 x 720), we recommend a preprocessing stage to save time for data loading. You can run the `preprocess.py` to crop each frame of the `REDS_deblur` dataset into 16 subregions.
 
 ```bash
 # You are in $(THIS_REPOSITORY)/.
@@ -91,11 +91,11 @@ $ python main.py --exp_name [EXPERIMENT_NAME]
 Additional arguments:
     --patch_size: Training patch size
     --batch_size: Training batch size
-    --epochs    : The number of total epochs
-    --lr        : Initial learning rate
-    --lr_gamma  : Learning rate decay factor
+    --epochs : The number of total epochs
+    --lr : Initial learning rate
+    --lr_gamma : Learning rate decay factor
     --milestones: Learning rate schedule (ex: --milestones 10 20 30)
-    --save_to   : Path of the model checkpoint (weights ONLY) to be saved
+    --save_to : Path of the model checkpoint (weights ONLY) to be saved
 ```
 
 Training logs will be saved under `logs/[EXPERIMENT_NAME]`. Find them out with TensorBoard:
@@ -114,14 +114,17 @@ If you are training your model with the TensorFlow framework, it is straightforw
 ```bash
 # You are in $(THIS_REPOSITORY)/.
 $ python convert_model.py
+# or
+$ python convert_model.py --save_to deblur_256.tflite --test example/input_256.png
 
 Additional arguments:
-    --img_h    : Height of the test image(s) (should be FIXED)
-    --img_w    : Width of the test image(s) (should be FIXED)
-    --load_from: Path to the model checkpoint
-    --save_to  : Path of the TFLite model to be saved
+    --load_from : Path to the model checkpoint
+    --save_to : Path to the TFLite model to be saved
+    --test : Path to the input image to be fed
 ```
 
+We note that this step is dependent on **image resolution**.
+Therefore, different input image sizes may result in different `.tflite` models.
 If you want to convert your PyTorch model to a TFLite model, please follow the guideline below.
 
 
@@ -132,13 +135,32 @@ You can easily check the converted TFLite model on your PC.
 ```bash
 # You are in $(THIS_REPOSITORY)/.
 $ python test_deblur.py
+# or
+$ python test_deblur.py -i example/input_256.png -m models/deblur_256.tflite
 
 Additional arguments:
-    -i, --image     : Path to the input image
+    -i, --image : Path to the input image
     -m, --model_file: Path to the TFLite model
 ```
 
 You can find a result image from `example/output.png`.
+
+If you would like to evaluate the model and generate output images on full validation/test set, you can try:
+
+```bash
+# You are in $(THIS_REPOSITORY)/.
+$ python test_deblur_full.py
+# or
+$ python test_deblur_full.py -t
+
+Additional arguments:
+    -p, --path : Path to the REDS_deblur dataset
+    -m, --model_file : Path to the TFLite model
+    -t, --test : Use the test split
+    -s, --save_results : Save output results under ./example
+```
+
+We note that this step does not support GPU acceleration yet and may take several hours in the case.
 
 
 ## Test your TFLite model on a real Android device
@@ -153,17 +175,17 @@ As a result, input-dependent models will not be allowed at this moment (and it i
 
 We use the [Google Pixel 4](https://store.google.com/?srp=/product/pixel_4) device (Android 10) for evaluation.
 If you are going to use different devices, please change some API versions to appropriate ones.
-More detailed explanation of the tutorial can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android), but we recommend to follow package versions of the configurations below.
+More detailed explanations of the tutorial can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android), but we recommend to follow package versions of the configurations below.
 
-First, install the [Android studio](https://developer.android.com/studio/install?hl=en) and SDK by running the studio.
+First, install the [Android Studio](https://developer.android.com/studio/install?hl=en) and SDK by running the studio.
 [Android NDK](https://developer.android.com/ndk/guides) is also required, and we note that the NDK version (**18b**) matters.
 Please download the zip file from [here](https://developer.android.com/ndk/downloads/older_releases.html#ndk-18b-downloads) and unzip it.
-If you are not sure with the file path, you can skip this now.
+If you are not sure about the file path, you can skip this now.
 
 Then, clone the TensorFlow official repository by following:
 
 ```bash
-# You can run the below scripts anywhere you want.
+# You can run the below scripts from anywhere you want.
 $ git clone --recurse-submodules https://github.com/tensorflow/tensorflow.git
 $ cd tensorflow
 ```
@@ -183,7 +205,7 @@ $ sudo apt update
 $ sudo apt install bazel-1.2.1
 ```
 
-Before building the evaluation binary, please setup the configuration by following:
+Before building the evaluation binary, please set the configuration by following:
 
 ```bash
 # You are in tensorflow/.
@@ -225,9 +247,9 @@ $ bazel build -c opt \
     tensorflow/lite/tools/benchmark:benchmark_model
 ```
 
-Connect your own Android device to PC.
+After the build successes, connect your Android device to PC.
 Please make sure that you have enabled the [USB debugging mode](https://developer.android.com/studio/debug/dev-options?hl=en) and allowed file transfer from PC.
-Now you are ready to run  the `.tflite` model on a real Android device.
+Now you are ready to run the `.tflite` model on a real Android device.
 
 ```bash
 # You are in tensorflow/.
@@ -240,23 +262,29 @@ $ adb shell /data/local/tmp/benchmark_model \
 ```
 
 Please find out **Average inference timings in us** from the printed logs.
-We note that Warpup & Init timings will not be considered in this challenge.
+We note that Wrapup & Init timings will not be considered in this challenge.
 
 We report performances of the provided baseline model (input: 256 x 256).
 More options can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/benchmark).
-Detailed analysis of each model and their quantized version will be uploaded soon.
+More detailed analysis of baseline models and their quantized version will be uploaded soon.
 
-| Avg. runtime(ms) and FPS (50 runs) |     CPU    |       GPU        |       NNAPI        |
-|:----------------------------------:|:----------:|:----------------:|:------------------:|
-|      Full-precision                | 775 / 1.30 |   121 / 8.23     |    226 / 4.42      |
-|         Quantized                  |      -     |        -         |         -          |
-|                                    |            | `--use_gpu=true` | `--use_nnapi=true` |
+| Avg. runtime(ms) / FPS (50 runs) | CPU | CPU | CPU |
+|:--------------:|:-----------:|:----------:|:----------:|
+| Full-precision | 1762 / 0.57 | 1146 / 0.87 | 775 / 1.30 |
+| Quantized | - | - | - |
+| | `--num_threads=1` | `--num_threads=2` | `--num_threads=4` |
+
+| Avg. runtime(ms) / FPS (50 runs) | CPU | GPU | NNAPI |
+|:--------------:|:----------:|:----------:|:----------:|
+| Full-precision | 1762 / 1.30 | 121 / 8.23 | 226 / 4.42 |
+| Quantized | - | - | - |
+| | `--num_threads=8` | `--use_gpu=true` | `--use_nnapi=true` |
 
 
 ## PyTorch `state_dict` to a TFLite model
 
 Unfortunately, there is no straightforward way to convert your PyTorch `state_dict` to a TFLite model directly.
-The major problem comes from the channel convention: while `(N, C, H, W)` is common in PyTorch, TFLite only supports `(N, H, W, C)`.
+The major problem comes from the channel convention: while `(N, C, H, W)` is a standard in PyTorch, TFLite only supports `(N, H, W, C)`.
 Please follow the steps below carefully to transfer your model from PyTorch.
 
 1) Train your model on PyTorch.

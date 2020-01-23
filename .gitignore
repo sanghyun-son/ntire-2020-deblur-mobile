@@ -1,4 +1,6 @@
 /REDS_deblur
+/example/val
+/example/test
 .vscode/
 
 # Byte-compiled / optimized / DLL files

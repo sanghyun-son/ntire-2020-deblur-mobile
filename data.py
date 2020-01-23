@@ -17,6 +17,11 @@ def normalize(x):
     x = x / 127.5 - 1
     return x
 
+def unnormalize(x):
+    x = 127.5 * (x + 1)
+    x = x.round().clip(min=0, max=255)
+    x = x.astype(np.uint8)
+    return x
 
 class REDS(utils.Sequence):
 
