@@ -268,17 +268,17 @@ We report performances of the provided baseline model (input: 256 x 256).
 More options can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/benchmark).
 More detailed analysis of baseline models and their quantized version will be uploaded soon.
 
-| Avg. runtime(ms) / FPS (50 runs) | CPU | CPU | CPU |
-|:--------------:|:-----------:|:----------:|:----------:|
-| Full-precision | 1762 / 0.57 | 1146 / 0.87 | 775 / 1.30 |
-| Quantized | - | - | - |
-| | `--num_threads=1` | `--num_threads=2` | `--num_threads=4` |
+| Avg. timing(ms) / FPS (50 runs) | CPU | CPU | CPU | PSNR
+|:--------------:|:-----------:|:----------:|:----------:|:----:|
+| Full-precision | 1762 / 0.57 | 1146 / 0.87 | 775 / 1.30 | - |
+| Quantized | - | - | - | - |
+| | `--num_threads=1` | `--num_threads=2` | `--num_threads=4` | |
 
-| Avg. runtime(ms) / FPS (50 runs) | CPU | GPU | NNAPI |
-|:--------------:|:----------:|:----------:|:----------:|
-| Full-precision | 1762 / 1.30 | 121 / 8.23 | 226 / 4.42 |
-| Quantized | - | - | - |
-| | `--num_threads=8` | `--use_gpu=true` | `--use_nnapi=true` |
+| Avg. runtime(ms) / FPS (50 runs) | CPU | GPU | NNAPI | PSNR
+|:--------------:|:----------:|:----------:|:----------:|:----:|
+| Full-precision | 768 / 1.30 | 121 / 8.23 | 226 / 4.42 | - |
+| Quantized | - | - | - | - |
+| | `--num_threads=8` | `--use_gpu=true` | `--use_nnapi=true` | |
 
 
 ## PyTorch `state_dict` to a TFLite model
