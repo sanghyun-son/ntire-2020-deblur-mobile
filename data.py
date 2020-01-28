@@ -25,7 +25,10 @@ def unnormalize(x):
 
 class REDS(utils.Sequence):
 
-    def __init__(self, batch_size, patch_size=96, target_dir='REDS_deblur', train=True):
+    def __init__(
+            self, batch_size, patch_size=96, target_dir='REDS',
+            train=True, keep_range=False):
+
         if train:
             split = 'train'
             split_path = 'train_crop'
@@ -49,6 +52,7 @@ class REDS(utils.Sequence):
         self.patch_size = patch_size
         self.scans = scans
         self.train = train
+        self.keep_range = keep_range
 
     def scan_over_dirs(self, d):
         file_list = []
@@ -75,8 +79,12 @@ class REDS(utils.Sequence):
             sharp = imageio.imread(sharp)
 
             blur, sharp = self.random_crop(blur, sharp)
-            blur = normalize(blur)
-            sharp = normalize(sharp)
+            if self.keep_range:
+                blur = blur.astype(np.float32) - 128
+                sharp = sharp.astype(np.float32) - 128
+            else:
+                blur = normalize(blur)
+                sharp = normalize(sharp)
 
             img_blur.append(blur)
             img_sharp.append(sharp)
@@ -97,6 +105,5 @@ class REDS(utils.Sequence):
         crop_blur = blur[py:(py + self.patch_size), px:(px + self.patch_size)]
         crop_sharp = sharp[py:(py + self.patch_size), px:(px + self.patch_size)]
         return crop_blur, crop_sharp
-
 
 

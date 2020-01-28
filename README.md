@@ -91,11 +91,11 @@ $ python main.py --exp_name [EXPERIMENT_NAME]
 Additional arguments:
     --patch_size: Training patch size
     --batch_size: Training batch size
-    --epochs : The number of total epochs
-    --lr : Initial learning rate
-    --lr_gamma : Learning rate decay factor
+    --epochs    : The number of total epochs
+    --lr        : Initial learning rate
+    --lr_gamma  : Learning rate decay factor
     --milestones: Learning rate schedule (ex: --milestones 10 20 30)
-    --save_to : Path of the model checkpoint (weights ONLY) to be saved
+    --save_to   : Path of the model checkpoint (weights ONLY) to be saved
 ```
 
 Training logs will be saved under `logs/[EXPERIMENT_NAME]`. Find them out with TensorBoard:
@@ -118,9 +118,10 @@ $ python convert_model.py
 $ python convert_model.py --save_to deblur_256.tflite --test example/input_256.png
 
 Additional arguments:
-    --load_from : Path to the model checkpoint
-    --save_to : Path to the TFLite model to be saved
-    --test : Path to the input image to be fed
+    -l, --load_from : Path to the model checkpoint
+    -s, --save_to   : Path to the TFLite model to be saved
+    -t, --test      : Path to the input image to be fed
+    -q, --quantize  : Post-training quantization option (weight, integer, integer_full, fp16)
 ```
 
 We note that this step is dependent on **image resolution**.
@@ -139,7 +140,7 @@ $ python test_deblur.py
 $ python test_deblur.py -i example/input_256.png -m models/deblur_256.tflite
 
 Additional arguments:
-    -i, --image : Path to the input image
+    -i, --image     : Path to the input image
     -m, --model_file: Path to the TFLite model
 ```
 
@@ -154,10 +155,10 @@ $ python test_deblur_full.py
 $ python test_deblur_full.py -t
 
 Additional arguments:
-    -p, --path : Path to the REDS_deblur dataset
-    -m, --model_file : Path to the TFLite model
-    -t, --test : Use the test split
-    -s, --save_results : Save output results under ./example
+    -p, --path          : Path to the REDS_deblur dataset
+    -m, --model_file    : Path to the TFLite model
+    -t, --test          : Use the test split
+    -s, --save_results  : Save output results under ./example
 ```
 
 We note that this step does not support GPU acceleration yet and may take several hours in the case.
@@ -268,15 +269,15 @@ We report performances of the provided baseline model (input: 256 x 256).
 More options can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/benchmark).
 More detailed analysis of baseline models and their quantized version will be uploaded soon.
 
-| Avg. timing(ms) / FPS (50 runs) | CPU | CPU | CPU | PSNR
+| Avg. timing(ms) / FPS (50 runs) | CPU | CPU | CPU | PSNR(dB)
 |:--------------:|:-----------:|:----------:|:----------:|:----:|
-| Full-precision | 1762 / 0.57 | 1146 / 0.87 | 775 / 1.30 | - |
+| Full-precision | 1762 / 0.57 | 1146 / 0.87 | 775 / 1.30 | 28.34 |
 | Quantized | - | - | - | - |
 | | `--num_threads=1` | `--num_threads=2` | `--num_threads=4` | |
 
 | Avg. runtime(ms) / FPS (50 runs) | CPU | GPU | NNAPI | PSNR
 |:--------------:|:----------:|:----------:|:----------:|:----:|
-| Full-precision | 768 / 1.30 | 121 / 8.23 | 226 / 4.42 | - |
+| Full-precision | 768 / 1.30 | 121 / 8.23 | 226 / 4.42 | 28.34 |
 | Quantized | - | - | - | - |
 | | `--num_threads=8` | `--use_gpu=true` | `--use_nnapi=true` | |
 

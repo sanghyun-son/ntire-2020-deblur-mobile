@@ -1,8 +1,16 @@
 import tensorflow.keras.backend as K
 import numpy as np
 
-def psnr(x, y, shave=4, luminance=False):
-    diff = 0.5 * (x - y)
+def psnr(x, y, shave=4, luminance=False, keep_range=False):
+    '''
+    Args:
+
+    Return:
+    '''
+    if keep_range:
+        diff = (x - y) / 255
+    else:
+        diff = (x - y) / 2
     '''
     if luminance:
         coeff = np.array([65.738, 129.057, 25.064]).reshape(1, 1, 1, 3) / 256.0
@@ -18,6 +26,9 @@ def psnr(x, y, shave=4, luminance=False):
 
 def psnr_y(x, y):
     return psnr(x, y, luminance=True)
+
+def psnr_full(x, y):
+    return psnr(x, y, keep_range=True)
 
 def psnr_np(x, y, shave=4, luminance=False):
     diff = x.astype(np.float32) - y.astype(np.float32)

@@ -14,6 +14,7 @@ import metric
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--patch_size', type=int, default=128)
+    parser.add_argument('--keep_range', action='store_true')
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--lr', type=float, default=1e-4)
@@ -34,15 +35,27 @@ def main():
             print(e)
 
     dataset_train = data.REDS(
-        cfg.batch_size, patch_size=cfg.patch_size, train=True
+        cfg.batch_size,
+        patch_size=cfg.patch_size,
+        train=True,
+        keep_range=cfg.keep_range,
     )
     # We have 3,000 validation frames.
     # Note that each frame will be center-cropped for the validation.
-    dataset_val = data.REDS(20, patch_size=cfg.patch_size, train=False)
+    dataset_val = data.REDS(
+        20,
+        patch_size=cfg.patch_size,
+        train=False,
+        keep_range=cfg.keep_range,
+    )
 
     net = model.Baseline(cfg.patch_size, cfg.patch_size)
     net.build(input_shape=(None, cfg.patch_size, cfg.patch_size, 3))
-    net.compile(optimizer='adam', loss='mse', metrics=[metric.psnr])
+    kwargs = {'optimizer': 'adam', 'loss': 'mse'}
+    if cfg.keep_range:
+        net.compile(**kwargs, metrics=[metric.psnr_full])
+    else:
+        net.compile(**kwargs, metrics=[metric.psnr])
     net.summary()
 
     # Callback functions

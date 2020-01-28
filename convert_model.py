@@ -10,9 +10,11 @@ from tensorflow import lite
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--load_from', type=str, default='models/deblur.hdf5')
-    parser.add_argument('--save_to', type=str, default='models/deblur.tflite')
-    parser.add_argument('--test', type=str, default='example/input.png')
+    parser.add_argument('-l', '--load_from', type=str, default='models/deblur.hdf5')
+    parser.add_argument('-s', '--save_to', type=str, default='models/deblur.tflite')
+    parser.add_argument('-t', '--test', type=str, default='example/input.png')
+    parser.add_argument('-o', '--optimize', type=str, default='')
+    parser.add_argument('-q', '--quantize', type=str, default='')
     cfg = parser.parse_args()
 
     gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -37,6 +39,21 @@ def main():
 
     # Convert to the TFLite model
     converter = lite.TFLiteConverter.from_keras_model(net)
+    if cfg.optimize == 'weight':
+        converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_LATENCY]
+    '''
+    elif 'integer' in cfg.quantize:
+        converter.optimizations = [tf.lite.Optimize.DEFAULT]
+        # Dataset for tuning
+        converter.representative_dataset = None
+        if 'full' in cfg.quantize:
+            converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
+            converter.inference_input_type = tf.uint8
+            converter.inference_output_type = tf.uint8
+    elif 'fp16' in cfg.quantize:
+        converter.optimizations = [tf.lite.Optimize.DEFAULT]
+        converter.target_spec.supported_types = [tf.float16]
+    '''
     lite_model = converter.convert()
     with open(cfg.save_to, 'wb') as f:
         f.write(lite_model)
