@@ -109,7 +109,7 @@ By default, [`localhost:6006`](http://localhost:6006/) will show you training an
 
 ## Convert your model to a TFLite model
 
-If you are training your model with the TensorFlow framework, it is straightforward to convert them into a TFLite model.
+If you have trained your model with the TensorFlow framework, it is straightforward to convert them into a TFLite model.
 
 ```bash
 # You are in $(THIS_REPOSITORY)/.
@@ -121,7 +121,6 @@ Additional arguments:
     -l, --load_from : Path to the model checkpoint
     -s, --save_to   : Path to the TFLite model to be saved
     -t, --test      : Path to the input image to be fed
-    -q, --quantize  : Post-training quantization option (weight, integer, integer_full, fp16)
 ```
 
 We note that this step is dependent on **image resolution**.
