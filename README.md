@@ -21,7 +21,7 @@ This repository is verified in the following environments:
 
 ## Prepare the dataset
 
-First, download the **REDS_deblur** dataset from the following links.
+First, download the **REDS** dataset from the following links.
 
 * Training data
  * Blur: [Google drive](https://drive.google.com/open?id=1Be2cgzuuXibcqAuJekDgvHq4MLYkCgR8) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/train_blur.zip)
@@ -37,8 +37,8 @@ First, download the **REDS_deblur** dataset from the following links.
 Your data should be organized as following:
 
 ```bash
-$(THIS_REPOSITORY)
-|-- REDS_deblur
+ntire-2020-deblur-mobile
+|--REDS
 |   |-- train
 |   |   |-- train_blur
 |   |   |   |-- 000
@@ -60,15 +60,15 @@ $(THIS_REPOSITORY)
 `-- ...
 ```
 
-Since images in the dataset are pretty large (1280 x 720), we recommend a preprocessing stage to save time for data loading. You can run the `preprocess.py` to crop each frame of the `REDS_deblur` dataset into 16 subregions.
+Since images in the dataset are pretty large (1280 x 720), we recommend a preprocessing stage to save time for data loading. You can run the `preprocess.py` to crop each frame of the `REDS` dataset into 16 subregions.
 
 ```bash
-# You are in $(THIS_REPOSITORY)/.
+# You are in ntire-2020-deblur-mobile/.
 # This may take some time...
 $ python preprocess.py
 ```
 
-After then, you will get `train_crop` under `REDS_deblur`. We note that this preprocessing **does not** affect to the number of effective training patches.
+After then, you will get `train_crop` under `REDS_deblur`. We note that this **does not** affect to the number of effective training patches.
 
 
 ## Training a baseline model
@@ -85,7 +85,7 @@ metric.py
 You can start the training by the following:
 
 ```bash
-# You are in $(THIS_REPOSITORY)/.
+# You are in ntire-2020-deblur-mobile/.
 $ python main.py --exp_name [EXPERIMENT_NAME]
 
 Additional arguments:
@@ -112,7 +112,7 @@ By default, [`localhost:6006`](http://localhost:6006/) will show you training an
 If you have trained your model with the TensorFlow framework, it is straightforward to convert them into a TFLite model.
 
 ```bash
-# You are in $(THIS_REPOSITORY)/.
+# You are in ntire-2020-deblur-mobile/.
 $ python convert_model.py
 # or
 $ python convert_model.py --save_to deblur_256.tflite --test example/input_256.png
@@ -133,7 +133,7 @@ If you want to convert your PyTorch model to a TFLite model, please follow the g
 You can easily check the converted TFLite model on your PC.
 
 ```bash
-# You are in $(THIS_REPOSITORY)/.
+# You are in ntire-2020-deblur-mobile/.
 $ python test_deblur.py
 # or
 $ python test_deblur.py -i example/input_256.png -m models/deblur_256.tflite
@@ -289,5 +289,5 @@ Please follow the steps below carefully to transfer your model from PyTorch.
 
 1) Train your model on PyTorch.
 2) Save your PyTorch `state_dict` (i.e., `torch.save(model.state_dict(), 'state_dict.pth')`).
-3) Define a [Keras model](https://www.tensorflow.org/api_docs/python/tf/keras/Model) which has the same structure to your PyTorch model.
+3) Define a [Keras model](https://www.tensorflow.org/api_docs/python/tf/keras/Model) which has the same structure to your PyTorch model. You can compare `model_pth.py` and `model.py` to see differences of two frameworks.
 4) Will be prepared soon...
