@@ -24,15 +24,15 @@ This repository is verified in the following environments:
 First, download the **REDS** dataset from the following links.
 
 * Training data
- * Blur: [Google drive](https://drive.google.com/open?id=1Be2cgzuuXibcqAuJekDgvHq4MLYkCgR8) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/train_blur.zip)
- * Sharp: [Google drive](https://drive.google.com/open?id=1YLksKtMhd2mWyVSkvhDaDLWSc1qYNCz-) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/train_sharp.zip)
+   * Blur: [Google drive](https://drive.google.com/open?id=1Be2cgzuuXibcqAuJekDgvHq4MLYkCgR8) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/train_blur.zip)
+   * Sharp: [Google drive](https://drive.google.com/open?id=1YLksKtMhd2mWyVSkvhDaDLWSc1qYNCz-) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/train_sharp.zip)
 
 * Validation data
- * Blur: [Google drive](https://drive.google.com/open?id=1N8z2yD0GDWmh6U4d4EADERtcUgDzGrHx) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/val_blur.zip)
- * Sharp: [Google drive](https://drive.google.com/open?id=1MGeObVQ1-Z29f-myDP7-8c3u0_xECKXq) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/val_sharp.zip)
+   * Blur: [Google drive](https://drive.google.com/open?id=1N8z2yD0GDWmh6U4d4EADERtcUgDzGrHx) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/val_blur.zip)
+   * Sharp: [Google drive](https://drive.google.com/open?id=1MGeObVQ1-Z29f-myDP7-8c3u0_xECKXq) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/val_sharp.zip)
 
 * Test data
- * Blur: [Google drive](https://drive.google.com/file/d/1dr0--ZBKqr4P1M8lek6JKD1Vd6bhhrZT/view?usp=sharing) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/test_blur.zip)
+   * Blur: [Google drive](https://drive.google.com/file/d/1dr0--ZBKqr4P1M8lek6JKD1Vd6bhhrZT/view?usp=sharing) / [SNU CVLab](https://cv.snu.ac.kr/~snah/Deblur/dataset/REDS/test_blur.zip)
 
 Your data should be organized as following:
 
