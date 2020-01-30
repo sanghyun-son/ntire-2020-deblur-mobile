@@ -36,7 +36,7 @@ import tensorflow as tf
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--path', type=str, default='REDS_deblur')
+    parser.add_argument('-p', '--path', type=str, default='REDS')
     parser.add_argument('-m', '--model_file', type=str, default='models/deblur.tflite')
     parser.add_argument('-t', '--test', action='store_true')
     parser.add_argument('-s', '--save_results', action='store_true')
@@ -102,7 +102,8 @@ def main():
                 os.makedirs(path.dirname(save_as), exist_ok=True)
                 imageio.imwrite(save_as, result)
 
-    print('Avg. PSNR: {:.2f}'.format(psnr_avg / len(input_list)))
+    if target_path is not None:
+        print('Avg. PSNR: {:.2f}'.format(psnr_avg / len(input_list)))
 
 if __name__ == '__main__':
     main()

@@ -100,74 +100,72 @@ Additional arguments:
 
 Training logs will be saved under `logs/[EXPERIMENT_NAME]`. Find them out with TensorBoard:
 ```bash
-# You are in $(THIS_REPOSITORY)/.
+# You are in ntire-2020-deblur-mobile/.
 $ tensorboard --logdir logs
 ```
 
 By default, [`localhost:6006`](http://localhost:6006/) will show you training and evaluation curves.
 
 
-## Convert your model to a TFLite model
+## Convert your model to a `.tflite` model
 
-If you have trained your model with the TensorFlow framework, it is straightforward to convert them into a TFLite model.
+If you have trained your model with the TensorFlow framework, it is straightforward to convert them into a `.tflite` model.
 
 ```bash
 # You are in ntire-2020-deblur-mobile/.
+# Model for evaluating PSNR
 $ python convert_model.py
-# or
+# Model for evaluating timing
 $ python convert_model.py --save_to deblur_256.tflite --test example/input_256.png
 
 Additional arguments:
     -l, --load_from : Path to the model checkpoint
-    -s, --save_to   : Path to the TFLite model to be saved
+    -s, --save_to   : Path to the .tflite model to be saved
     -t, --test      : Path to the input image to be fed
 ```
 
 We note that this step is dependent on **image resolution**.
 Therefore, different input image sizes may result in different `.tflite` models.
-If you want to convert your PyTorch model to a TFLite model, please follow the guideline below.
+If you want to convert your PyTorch model to a `.tflite` model, please follow the guideline below.
 
 
-## Test your TFLite model
+## Test your `.tflite` model
 
-You can easily check the converted TFLite model on your PC.
+You can easily check and evaluate the converted `.tflite` model on your PC.
 
 ```bash
 # You are in ntire-2020-deblur-mobile/.
 $ python test_deblur.py
 # or
+# Check the execution on a 256x256 input.
 $ python test_deblur.py -i example/input_256.png -m models/deblur_256.tflite
+# or
+# Test the model on the val split
+$ python test_deblur_full.py -m models/deblur.tflite
+# Generate result images on the test split
+$ python test_deblur_full.py -m models/deblur.tflite -t -s
 
-Additional arguments:
-    -i, --image     : Path to the input image
-    -m, --model_file: Path to the TFLite model
+Additional arguments for test_deblur.py:
+    -i, --image         : Path to the input image
+    -m, --model_file    : Path to the .tflite model
+
+    We note that the .tflite model is dependent to input image resolution.
+
+Additional arguments for test_deblur_full.py:
+    -m, --model_file    : Path to the .tflite model (for 1280x720 inputs)
+    -t, --test          : Use the test split
+    -s, --save_results  : Save result images under example/val or example/test
 ```
 
 You can find a result image from `example/output.png`.
-
-If you would like to evaluate the model and generate output images on full validation/test set, you can try:
-
-```bash
-# You are in $(THIS_REPOSITORY)/.
-$ python test_deblur_full.py
-# or
-$ python test_deblur_full.py -t
-
-Additional arguments:
-    -p, --path          : Path to the REDS_deblur dataset
-    -m, --model_file    : Path to the TFLite model
-    -t, --test          : Use the test split
-    -s, --save_results  : Save output results under ./example
-```
-
-We note that this step does not support GPU acceleration yet and may take several hours in the case.
+We note that this step may not support GPU acceleration and take several hours in the case.
 
 
-## Test your TFLite model on a real Android device
+## Test your `.tflite` model on a real Android device
 
-We note that final submissions should be generated from the submitted TFLite model.
-We will double-check whether submitted deblurred images can be acquired from the submitted TFLite models.
-However, for easier performance evaluation, we will execute the TFLite model on a real Android device **only** for measuring runtime.
+We note that final submissions should be generated from the submitted `.tflite` model.
+We will double-check whether submitted deblurred images can be acquired from the submitted `.tflite` models.
+However, for easier performance evaluation, we will execute the `.tflite` model on a real Android device **only** for measuring runtime.
 Detailed comments on this concept can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/benchmark).
 
 In short, we will measure the average runtime of each model using randomly generated inputs.
@@ -195,6 +193,7 @@ Detailed descriptions can be found from [here](https://docs.bazel.build/versions
 We note that the Bazel version (**1.2.1**) matters.
 
 ```bash
+# You can run the below scripts from anywhere.
 $ sudo apt install curl
 $ curl https://bazel.build/bazel-release.pub.gpg \
     | sudo apt-key add -
@@ -264,27 +263,30 @@ $ adb shell /data/local/tmp/benchmark_model \
 Please find out **Average inference timings in us** from the printed logs.
 We note that Wrapup & Init timings will not be considered in this challenge.
 
-We report performances of the provided baseline model (input: 256 x 256).
+We report performances of the provided baseline model.
+For some hardware-related issues, timings is measured with inputs of 256 x 256 (`models/deblur_256.tflite`) while 1280 x 720 inputs (`models/deblur.tflite`) are used to measure PSNR.
 More options can be found from [here](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/tools/benchmark).
-More detailed analysis of baseline models and their quantized version will be uploaded soon.
+Detailed analysis of baseline models and their quantized version will be uploaded soon.
 
 | Avg. timing(ms) / FPS (50 runs) | CPU | CPU | CPU | PSNR(dB)
 |:--------------:|:-----------:|:----------:|:----------:|:----:|
-| Full-precision | 1762 / 0.57 | 1146 / 0.87 | 775 / 1.30 | 28.34 |
+| FP32 and FP16 | 1762 / 0.57 | 1146 / 0.87 | 775 / 1.30 | 28.34 |
 | Quantized | - | - | - | - |
 | | `--num_threads=1` | `--num_threads=2` | `--num_threads=4` | |
 
-| Avg. runtime(ms) / FPS (50 runs) | CPU | GPU | NNAPI | PSNR
+| Avg. timing(ms) / FPS (50 runs) | CPU | GPU | NNAPI | PSNR
 |:--------------:|:----------:|:----------:|:----------:|:----:|
-| Full-precision | 768 / 1.30 | 121 / 8.23 | 226 / 4.42 | 28.34 |
+| FP32 and FP16 | 768 / 1.30 | 121 / 8.23 | 226 / 4.42 | 28.34 |
 | Quantized | - | - | - | - |
 | | `--num_threads=8` | `--use_gpu=true` | `--use_nnapi=true` | |
 
+* Notes
+  * While FP16 models (e.g., `models/deblur_fp16_256.tflite`) are smaller than FP32 models, they may not have advantages compared to FP32 counterparts in terms of runtime. Please check the [link](https://www.tensorflow.org/lite/performance/post_training_float16_quant).
 
-## PyTorch `state_dict` to a TFLite model
+## PyTorch `state_dict` to a `.tflite`  model
 
-Unfortunately, there is no straightforward way to convert your PyTorch `state_dict` to a TFLite model directly.
-The major problem comes from the channel convention: while `(N, C, H, W)` is a standard in PyTorch, TFLite only supports `(N, H, W, C)`.
+Unfortunately, there is no straightforward way to convert your PyTorch `state_dict` to a `.tflite` model directly.
+The major problem comes from the channel convention: while `(N, C, H, W)` is a standard in PyTorch, `.tflite` only supports `(N, H, W, C)`.
 Please follow the steps below carefully to transfer your model from PyTorch.
 
 1) Train your model on PyTorch.
