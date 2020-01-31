@@ -155,6 +155,7 @@ Additional arguments for test_deblur_full.py:
     -m, --model_file    : Path to the .tflite model (for 1280x720 inputs)
     -t, --test          : Use the test split
     -s, --save_results  : Save result images under example/val or example/test
+    -256, --use_256     : Crop input images to 256x256 patches and fed to the network
 ```
 
 You can find a result image from `example/output.png`.
@@ -274,7 +275,7 @@ Detailed analysis of baseline models and their quantized version will be uploade
 | Quantized | - | - | - | - |
 | | `--num_threads=1` | `--num_threads=2` | `--num_threads=4` | |
 
-| Avg. timing(ms) / FPS (50 runs) | CPU | GPU | NNAPI | PSNR
+| Avg. timing(ms) / FPS (50 runs) | CPU | GPU | NNAPI | PSNR(dB)
 |:--------------:|:----------:|:----------:|:----------:|:----:|
 | FP32 and FP16 | 768 / 1.30 | 121 / 8.23 | 226 / 4.42 | 28.34 |
 | Quantized | - | - | - | - |
@@ -282,6 +283,7 @@ Detailed analysis of baseline models and their quantized version will be uploade
 
 * Notes
   * While FP16 models (e.g., `models/deblur_fp16_256.tflite`) are smaller than FP32 models, they may not have advantages compared to FP32 counterparts in terms of runtime. Please check the [link](https://www.tensorflow.org/lite/performance/post_training_float16_quant).
+  * FP16 inference is very slow with NNAPI!
 
 ## PyTorch `state_dict` to a `.tflite`  model
 
