@@ -89,7 +89,7 @@ def main():
         input_data = np.expand_dims(input_img, axis=0)
         if args.use_256:
             # Split the image into 256 x 256 patches
-            input_list = []
+            blur_list = []
             ps = 256
             _, h, w, _ = input_data.shape
             nh = math.ceil(h / ps)
@@ -102,12 +102,12 @@ def main():
                 for iw in range(nw):
                     pw = iw * (ps - mw)
                     patch = input_data[..., ph:ph + ps, pw:pw + ps, :]
-                    input_list.append(patch)
+                    blur_list.append(patch)
         else:
-            input_list = [input_data]
+            blur_list = [input_data]
 
         output_list = []
-        for x in input_list:
+        for x in blur_list:
             interpreter.set_tensor(input_details[0]['index'], x)
             interpreter.invoke()
             output_data = interpreter.get_tensor(output_details[0]['index'])
