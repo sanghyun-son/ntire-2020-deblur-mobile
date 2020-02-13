@@ -16,6 +16,7 @@ def main():
     parser.add_argument('--patch_size', type=int, default=128)
     parser.add_argument('--keep_range', action='store_true')
     parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--depth', type=int, default=4)
     parser.add_argument('--epochs', type=int, default=20)
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--lr_gamma', type=float, default=0.5)
@@ -49,7 +50,12 @@ def main():
         keep_range=cfg.keep_range,
     )
 
-    net = model.Baseline(cfg.patch_size, cfg.patch_size)
+    if cfg.depth == 4:
+        net = model.Baseline(cfg.patch_size, cfg.patch_size)
+    else:
+        net_class = getattr(model, 'Small{}'.format(cfg.depth))
+        net = net_class(cfg.patch_size, cfg.patch_size)
+
     net.build(input_shape=(None, cfg.patch_size, cfg.patch_size, 3))
     kwargs = {'optimizer': 'adam', 'loss': 'mse'}
     if cfg.keep_range:

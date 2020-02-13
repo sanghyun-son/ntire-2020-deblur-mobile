@@ -12,6 +12,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--load_from', type=str, default='models/deblur.hdf5')
     parser.add_argument('-s', '--save_to', type=str, default='models/deblur.tflite')
+    parser.add_argument('-d', '--depth', type=int, default=4)
     parser.add_argument('-t', '--test', type=str, default='example/input.png')
     parser.add_argument('-o', '--optimize', type=str, default='')
     parser.add_argument('-q', '--quantize', type=str, default='')
@@ -30,7 +31,18 @@ def main():
     test_input = np.expand_dims(test_input, axis=0)
     _, h, w, c = test_input.shape
 
-    net = model.Baseline(h, w)
+    representative = 'REDS/{}/train_blur'
+    if h == 256 and w == 256:
+        representative = representative.format('train_crop')
+    else:
+        representative = representative.format('train')
+
+    if cfg.depth == 4:
+        net = model.Baseline(h, w)
+    else:
+        net_class = getattr(model, 'Small{}'.format(cfg.depth))
+        net = net_class(h, w)
+
     net.build(input_shape=(None, h, w, c))
     net.load_weights(cfg.load_from)
     # Make a dummy prediction to get the input shape
