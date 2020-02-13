@@ -37,6 +37,34 @@ class Baseline(keras.Model):
         res = self.conv_out(res)
         return x + res
 
+
+class Small0(keras.Model):
+    '''
+    Baseline residual network with global and local skip connections.
+
+    Args:
+        img_h (int): Height of the input image.
+        img_w (int): Width of the input image.
+        n_colors (int, default=3): The number of the color channels.
+        n_feats (int, default=64): The number of the intermediate features.
+    '''
+
+    def __init__(self, img_h, img_w, n_colors=3, n_feats=64):
+        super().__init__()
+        shape = (img_h, img_w, n_colors)
+        self.conv_in = layers.Conv2D(
+            n_feats, 3, input_shape=shape, padding='same'
+        )
+        self.relu = ReLU()
+        self.conv_out = layers.Conv2D(n_colors, 3, padding='same')
+
+    def call(self, x):
+        res = self.conv_in(x)
+        res = self.relu(res)
+        res = self.conv_out(res)
+        return x + res
+
+
 class Small1(keras.Model):
     '''
     Baseline residual network with global and local skip connections.
