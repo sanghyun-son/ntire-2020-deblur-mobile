@@ -55,7 +55,7 @@ class Small0(keras.Model):
         self.conv_in = layers.Conv2D(
             n_feats, 3, input_shape=shape, padding='same'
         )
-        self.relu = ReLU()
+        self.relu = layers.ReLU()
         self.conv_out = layers.Conv2D(n_colors, 3, padding='same')
 
     def call(self, x):

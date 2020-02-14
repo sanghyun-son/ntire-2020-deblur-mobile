@@ -95,7 +95,7 @@ Additional arguments:
     --lr        : Initial learning rate
     --lr_gamma  : Learning rate decay factor
     --milestones: Learning rate schedule (ex: --milestones 10 20 30)
-    --save_to   : Path of the model checkpoint (weights ONLY) to be saved
+    --save_as   : Path of the model checkpoint (weights ONLY) to be saved
 ```
 
 Training logs will be saved under `logs/[EXPERIMENT_NAME]`. Find them out with TensorBoard:

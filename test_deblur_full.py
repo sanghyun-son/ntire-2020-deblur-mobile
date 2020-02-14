@@ -36,7 +36,7 @@ import tensorflow as tf
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--path', type=str, default='REDS_deblur')
+    parser.add_argument('-p', '--path', type=str, default='REDS')
     parser.add_argument('-m', '--model_file', type=str, default='models/deblur.tflite')
     parser.add_argument('-t', '--test', action='store_true')
     parser.add_argument('-s', '--save_results', action='store_true')

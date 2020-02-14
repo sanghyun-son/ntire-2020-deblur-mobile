@@ -22,7 +22,7 @@ def main():
     parser.add_argument('--lr_gamma', type=float, default=0.5)
     parser.add_argument('--milestones', nargs='+', default=[10, 15])
     parser.add_argument('--exp_name', type=str, default='baseline')
-    parser.add_argument('--save_to', type=str, default='models/deblur.hdf5')
+    parser.add_argument('--save_as', type=str, default='models/deblur.hdf5')
     cfg = parser.parse_args()
 
     # For checking the GPU usage
@@ -71,9 +71,9 @@ def main():
         update_freq=100,
     )
     # For checkpointing
-    os.makedirs(path.dirname(cfg.save_to), exist_ok=True)
+    os.makedirs(path.dirname(cfg.save_as), exist_ok=True)
     checkpointing = callbacks.ModelCheckpoint(
-        cfg.save_to,
+        cfg.save_as,
         verbose=1,
         save_weights_only=True,
     )
