@@ -1,9 +1,15 @@
+import os
+from os import path
+import glob
+import random
 import argparse
+
 import data
 import model
 
 import numpy as np
 import imageio
+import tqdm
 
 import tensorflow as tf
 from tensorflow import lite
@@ -33,6 +39,7 @@ def main():
 
     representative = 'REDS/{}/train_blur'
     if h == 256 and w == 256:
+        print('hi')
         representative = representative.format('train_crop')
     else:
         representative = representative.format('train')
@@ -53,15 +60,31 @@ def main():
     converter = lite.TFLiteConverter.from_keras_model(net)
     if cfg.optimize == 'weight':
         converter.optimizations = [tf.lite.Optimize.OPTIMIZE_FOR_LATENCY]
-    '''
     elif 'integer' in cfg.quantize:
         converter.optimizations = [tf.lite.Optimize.DEFAULT]
         # Dataset for tuning
-        converter.representative_dataset = None
+        def gen_rep():
+            list_dir = os.listdir(representative)
+            list_dir.sort()
+            for d in tqdm.tqdm(list_dir, ncols=80):
+                imgs = glob.glob(path.join(representative, d, '*.png'))
+                img = random.choice(imgs)
+                x = imageio.imread(img)
+                hh, ww, _ = x.shape
+                py = random.randrange(0, hh - h + 1)
+                px = random.randrange(0, ww - w + 1)
+                x = x[py:(py + h), px:(px + w)]
+                x = np.expand_dims(x, axis=0)
+                x = x.astype(np.float32)
+                x = x - 128
+                yield [x]
+
+        converter.representative_dataset = gen_rep
         if 'full' in cfg.quantize:
             converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
             converter.inference_input_type = tf.uint8
             converter.inference_output_type = tf.uint8
+    '''
     elif 'fp16' in cfg.quantize:
         converter.optimizations = [tf.lite.Optimize.DEFAULT]
         converter.target_spec.supported_types = [tf.float16]
