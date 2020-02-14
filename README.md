@@ -7,13 +7,13 @@ This repository provides a basic tutorial for the NTIRE 2020 Image Deblurring Ch
 Both model performance (PSNR) and runtime (FPS) are important. We evaluate the tradeoff between those measures.
 
 * `psnr_score`: PSNR measured on the test dataset (we use RGB channels)
-* `fps_score`: Log-scale acceleration ratio over the baseline GPU model log2(`fps_submitted / 8.23`). However, to provide some trivial solutions (e.g. identity mapping, CNNs with 2 layers, ...), we limit the maximum `fps_submitted` to **45**.
+* `fps_score`: Log-scale acceleration ratio over the baseline GPU model, which is defined by log2(`fps_submitted / 8.23`). To provide some trivial solutions (e.g. identity mapping, CNNs with 2 layers, ...), we limit the maximum `fps_submitted` to **45**.
 
 The final score will be calculated as:
 ```python
-final_score = psnr_score + 0.5 * fps_score
+final_score = psnr_score + 0.5 * fps_score,
 ```
-, where `0.5` is a tradeoff parameter based on our ablation studies.
+where `0.5` is a tradeoff parameter based on our ablation studies.
 
 Below is an example of the proposed evaluation metric:
 
