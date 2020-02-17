@@ -33,6 +33,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--image', type=str, default='example/input.png')
     parser.add_argument('-m', '--model_file', type=str, default='models/deblur.tflite')
+    parser.add_argument('-q', '--quantized', action='store_true')
     args = parser.parse_args()
 
     interpreter = tf.lite.Interpreter(model_path=args.model_file)
@@ -42,7 +43,6 @@ def main():
     output_details = interpreter.get_output_details()
 
     # check the type of the input tensor
-    floating_model = input_details[0]['dtype'] == np.float32
 
     # NxHxWxC, H:1, W:2
     img = imageio.imread(args.image)
@@ -50,7 +50,10 @@ def main():
     save_dir = 'example'
     os.makedirs(save_dir, exist_ok=True)
 
-    if floating_model:
+    if args.quantized:
+        img = img.astype(np.float32)
+        img = img - 128
+    else:
         img = data.normalize(img)
 
     input_data = np.expand_dims(img, axis=0)
@@ -63,8 +66,13 @@ def main():
 
     output_data = interpreter.get_tensor(output_details[0]['index'])
     results = np.squeeze(output_data)
+    results = results.astype(np.float32)
 
-    results = 127.5 * (results + 1)
+    if args.quantized:
+        results = results + 128
+    else:
+        results = 127.5 * (results + 1)
+
     results = results.round().clip(min=0, max=255)
     results = results.astype(np.uint8)
 
