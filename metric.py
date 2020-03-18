@@ -1,7 +1,7 @@
 import tensorflow.keras.backend as K
 import numpy as np
 
-def psnr(x, y, shave=4, luminance=False, keep_range=False):
+def psnr(x, y, shave=0, luminance=False, keep_range=False):
     '''
     Args:
 
@@ -18,8 +18,9 @@ def psnr(x, y, shave=4, luminance=False, keep_range=False):
         diff *= coeff
         diff = K.sum(diff, axis=-1)
     '''
-    diff = diff[..., shave:-shave, shave:-shave, :]
-    #mse = np.mean(diff**2)
+    if shave > 0:
+        diff = diff[..., shave:-shave, shave:-shave, :]
+
     mse = K.mean(diff**2)
     ret = -10.0 * (K.log(mse) / K.log(10.0))
     return ret
@@ -30,10 +31,13 @@ def psnr_y(x, y):
 def psnr_full(x, y):
     return psnr(x, y, keep_range=True)
 
-def psnr_np(x, y, shave=4, luminance=False):
+def psnr_np(x, y, shave=0, luminance=False):
     diff = x.astype(np.float32) - y.astype(np.float32)
-    diff = diff[..., shave:-shave, shave:-shave, :]
+    if shave > 0:
+        diff = diff[..., shave:-shave, shave:-shave, :]
+
     diff = diff / 255
     mse = np.mean(diff**2)
     ret = -10.0 * (np.log(mse) / K.log(10.0))
     return ret
+

@@ -329,13 +329,3 @@ Detailed analysis of baseline models and their quantized version will be uploade
   
   ![](example/output_256_quantized.png) **Output (Post-quantization by TFLite)**
 
-## PyTorch `state_dict` to a `.tflite`  model
-
-Unfortunately, there is no straightforward way to convert your PyTorch `state_dict` to a `.tflite` model directly.
-The major problem comes from the channel convention: while `(N, C, H, W)` is a standard in PyTorch, `.tflite` only supports `(N, H, W, C)`.
-Please follow the steps below carefully to transfer your model from PyTorch.
-
-1) Train your model on PyTorch.
-2) Save your PyTorch `state_dict` (i.e., `torch.save(model.state_dict(), 'state_dict.pth')`).
-3) Define a [Keras model](https://www.tensorflow.org/api_docs/python/tf/keras/Model) which has the same structure to your PyTorch model. You can compare `model_pth.py` and `model.py` to see differences of two frameworks.
-4) Will be prepared soon...
